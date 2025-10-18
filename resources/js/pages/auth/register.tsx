@@ -27,12 +27,29 @@ export default function Register() {
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
+                                <Label htmlFor="username">Username</Label>
+                                <Input
+                                    id="username"
+                                    type="text"
+                                    required
+                                    autoFocus
+                                    tabIndex={1}
+                                    autoComplete="username"
+                                    name="username"
+                                    placeholder="Username"
+                                />
+                                <InputError
+                                    message={errors.username}
+                                    className="mt-2"
+                                />
+                            </div>
+
+                            <div className="grid gap-2">
                                 <Label htmlFor="name">Name</Label>
                                 <Input
                                     id="name"
                                     type="text"
                                     required
-                                    autoFocus
                                     tabIndex={1}
                                     autoComplete="name"
                                     name="name"

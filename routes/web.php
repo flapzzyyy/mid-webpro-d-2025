@@ -5,7 +5,11 @@ use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ListController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\Auth\ProvideRedirectController;
+use App\Http\Controllers\Auth\ProvideCallbackController;
 
+Route::get('/auth/{provider}/redirect', ProvideRedirectController::class)->name('auth.redirect');
+Route::get('/auth/{provider}/callback', ProvideCallbackController::class)->name('auth.callback');
 
 Route::get('/', function () {
     return Inertia::render('welcome');
