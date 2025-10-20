@@ -3,6 +3,7 @@ import { send } from '@/routes/verification';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
+import { toast } from 'sonner';
 
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
@@ -50,6 +51,22 @@ export default function Profile({
                     >
                         {({ processing, recentlySuccessful, errors }) => (
                             <>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="username">Username</Label>
+                                    <div
+                                        onClick={() => toast.error('Username tidak dapat diubah')}
+                                        className="cursor-pointer"
+                                        title="Username Anda tidak dapat diubah."
+                                    >
+                                        <Input
+                                            id="username"
+                                            type="text"
+                                            defaultValue={auth.user.username as string}
+                                            disabled
+                                            className="disabled:cursor-pointer disabled:opacity-75"
+                                        />
+                                    </div>
+                                </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="name">Name</Label>
 
