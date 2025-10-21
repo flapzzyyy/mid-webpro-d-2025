@@ -14,6 +14,7 @@ class Task extends Model
         'due_date',
         'list_id',
     ];
+
     public function list(): BelongsTo
     {
         return $this->belongsTo(TaskList::class, 'list_id');

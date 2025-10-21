@@ -9,15 +9,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class TaskList extends Model
 {
     protected $table = 'lists';
+
     protected $fillable = [
         'title',
         'description',
         'user_id',
     ];
+
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
     }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
