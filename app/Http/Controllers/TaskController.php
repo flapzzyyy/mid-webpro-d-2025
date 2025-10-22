@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
-use App\Models\TaskCategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\TaskCategory;
+use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
@@ -16,9 +17,10 @@ class TaskController extends Controller
     {
         $query = Task::with('category')
             ->whereHas('category', function ($query) {
-                $query->where('user_id', auth()->id());
+                $query->where('user_id', Auth::id());
             })->orderBy('created_at', 'desc');
 
+        // search
         if (request()->has('search')) {
             $search = request('search');
             $query->where(function ($q) use ($search) {
@@ -27,19 +29,28 @@ class TaskController extends Controller
             });
         }
 
+        // filter by status (mapping dari parameter 'filter')
         if (request()->has('filter') && request('filter') !== 'all') {
-            $query->where('is_completed', request('filter') === 'completed');
+            $filter = request('filter');
+            $statusMap = [
+                'completed' => 'Completed',
+                'in_progress' => 'In Progress',
+                'not_started' => 'Not Started',
+            ];
+            if (isset($statusMap[$filter])) {
+                $query->where('status', $statusMap[$filter]);
+            }
         }
 
         $tasks = $query->paginate(10);
-        $categories = TaskCategory::where('user_id', auth()->id())->get();
+        $categories = TaskCategory::where('user_id', Auth::id())->get();
 
-        return Inertia::render('task/index', [
+        return Inertia::render('tasks/index', [
             'tasks' => $tasks,
             'categories' => $categories,
             'filters' => [
                 'search' => request('search', ''),
-                'filter' => request('filter', ''),
+                'filter' => request('filter', 'all'),
             ],
             'flash' => [
                 'success' => session('success'),
@@ -51,9 +62,18 @@ class TaskController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        // Ambil semua list milik user yang login
+        $categories = \App\Models\TaskCategory::where('user_id', Auth::id())->get();
+
+        // Jika dikirim ?list_id=... dari URL (misal dari tombol di halaman list)
+        $selectedList = $request->get('category_id');
+
+        return \Inertia\Inertia::render('tasks/create', [
+            'categories' => $categories,
+            'selectedList' => $selectedList,
+        ]);
     }
 
     /**
@@ -65,13 +85,15 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'due_date' => 'nullable|date',
-            'category_id' => 'required|exists:categories,id',
             'status' => 'required|string|in:Not Started,In Progress,Completed',
+            'category_id' => 'required|exists:categories,id',
         ]);
-        Task::create($validated);
 
-        return redirect()->route('tasks.index')->with('success', 'Task created successfully');
+        \App\Models\Task::create($validated);
+
+        return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
     }
+
 
     /**
      * Display the specified resource.
@@ -84,27 +106,36 @@ class TaskController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(\App\Models\Task $task)
     {
-        //
+        // Ambil semua list milik user (buat dropdown)
+        $categories = \App\Models\TaskCategory::where('user_id', Auth::id())->get();
+
+        return \Inertia\Inertia::render('tasks/create', [
+            'task' => $task,
+            'categories' => $categories,
+        ]);
     }
+
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Task $task)
+    public function update(Request $request, \App\Models\Task $task)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'due_date' => 'nullable|date',
-            'category_id' => 'required|exists:categories,id',
             'status' => 'required|string|in:Not Started,In Progress,Completed',
+            'category_id' => 'required|exists:categories,id',
         ]);
+
         $task->update($validated);
 
-        return redirect()->route('tasks.index')->with('success', 'Task updated successfully');
+        return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -112,7 +143,6 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $task->delete();
-
         return redirect()->route('tasks.index')->with('success', 'Task deleted successfully');
     }
 }

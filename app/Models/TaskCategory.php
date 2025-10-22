@@ -18,7 +18,7 @@ class TaskCategory extends Model
 
     public function tasks(): HasMany
     {
-        return $this->hasMany(Task::class);
+        return $this->hasMany(Task::class, 'category_id');
     }
 
     public function user(): BelongsTo

@@ -2,88 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
 use App\Models\TaskCategory;
-use Illuminate\Http\Request;
+use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $user = auth()->user();
-        $categories = TaskCategory::where('user_id', $user->id)->get();
-        $tasks = Task::whereHas('category', function ($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })->get();
+        $user = Auth::user();
 
-        $stats = [
-            'total_categories' => $categories->count(),
-            'total_tasks' => $tasks->count(),
-            'completed_tasks' => $tasks->where('status', 'Completed')->count(),
-            'in_progress_tasks' => $tasks->where('status', 'In Progress')->count(),
-            'not_started_tasks' => $tasks->where('status', 'Not Started')->count(),
-        ];
+        // Ambil total list dan task milik user
+        $totalCategories = TaskCategory::where('user_id', $user->id)->count();
+        $totalTasks = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))->count();
+
+        // Ambil 5 task terbaru milik user
+        $recentTasks = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
+            ->latest()
+            ->take(5)
+            ->get(['id', 'title', 'status', 'due_date']);
 
         return Inertia::render('dashboard', [
-            'stats' => $stats,
-            'categories' => $categories,
-            'tasks' => $tasks,
-            'flash' => [
-                'success' => session('success'),
-                'error' => session('error'),
-            ],
+            'user' => $user,
+            'totalCategories' => $totalCategories,
+            'totalTasks' => $totalTasks,
+            'recentTasks' => $recentTasks,
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }
