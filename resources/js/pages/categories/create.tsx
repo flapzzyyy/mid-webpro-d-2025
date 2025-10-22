@@ -29,7 +29,7 @@ export default function CreateOrEdit({ category }: Props) {
 
   const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
-    { title: 'categories', href: '/categories' },
+    { title: 'Categories', href: '/categories' },
     { title: category ? 'Edit' : 'Create', href: category ? `/categories/${category.id}/edit` : '/categories/create' },
   ];
 

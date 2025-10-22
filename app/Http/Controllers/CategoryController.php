@@ -15,21 +15,21 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = TaskCategory::where('user_id', Auth::id())->withCount('tasks')->get();
-        return Inertia::render('categories/index', [
+        $user = Auth::user();
+
+        $categories = TaskCategory::where('user_id', $user->id)
+            ->get(['id', 'title', 'description']);
+
+        return inertia('categories/index', [
             'categories' => $categories,
-            'flash' => session('success'),
-            'error' => session('error'),
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return Inertia::render('categories/create');
+        return inertia('categories/create');
     }
+
 
     /**
      * Store a newly created resource in storage.
