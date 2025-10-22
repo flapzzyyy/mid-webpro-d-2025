@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TaskList;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\TaskList;
 
 class ListController extends Controller
 {
@@ -14,7 +15,6 @@ class ListController extends Controller
     public function index()
     {
         $lists = TaskList::where('user_id', auth()->id())->get();
-
         return Inertia::render('list/index', [
             'lists' => $lists,
             'flash' => session('success'),
@@ -41,9 +41,8 @@ class ListController extends Controller
         ]);
         TaskList::create([
             ...$validated,
-            'user_id' => auth()->id(),
+            'user_id' => auth()->id()
         ]);
-
         return redirect()->route('lists.index')->with('success', 'List created successfully');
     }
 
@@ -73,7 +72,6 @@ class ListController extends Controller
             'description' => 'nullable|string',
         ]);
         $list->update($validated);
-
         return redirect()->route('lists.index')->with('success', 'List updated successfully');
     }
 
@@ -83,7 +81,6 @@ class ListController extends Controller
     public function destroy(TaskList $list)
     {
         $list->delete();
-
         return redirect()->route('lists.index')->with('success', 'List deleted successfully');
     }
 }

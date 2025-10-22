@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\Auth\ProvideCallbackController;
-use App\Http\Controllers\Auth\ProvideRedirectController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ListController;
 use App\Http\Controllers\TaskController;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use App\Http\Controllers\Auth\ProvideRedirectController;
+use App\Http\Controllers\Auth\ProvideCallbackController;
 
 Route::get('/auth/{provider}/redirect', ProvideRedirectController::class)->name('auth.redirect');
 Route::get('/auth/{provider}/callback', ProvideCallbackController::class)->name('auth.callback');

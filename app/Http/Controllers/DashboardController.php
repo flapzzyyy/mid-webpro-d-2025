@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
-use App\Models\TaskList;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\TaskList;
+use App\Models\Task;
 
 class DashboardController extends Controller
 {
@@ -35,7 +35,7 @@ class DashboardController extends Controller
             'flash' => [
                 'success' => session('success'),
                 'error' => session('error'),
-            ],
+            ]
         ]);
     }
 

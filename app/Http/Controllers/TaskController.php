@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
-use App\Models\TaskList;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\TaskList;
+use App\Models\Task;
 
 class TaskController extends Controller
 {
@@ -21,7 +21,8 @@ class TaskController extends Controller
 
         if (request()->has('search')) {
             $search = request('search');
-            $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search)
+            {
                 $q->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
             });
@@ -44,7 +45,7 @@ class TaskController extends Controller
             'flash' => [
                 'success' => session('success'),
                 'error' => session('error'),
-            ],
+            ]
         ]);
     }
 
@@ -69,7 +70,6 @@ class TaskController extends Controller
             'status' => 'required|string|in:Not Started,In Progress,Completed',
         ]);
         Task::create($validated);
-
         return redirect()->route('tasks.index')->with('success', 'Task created successfully');
     }
 
@@ -102,7 +102,6 @@ class TaskController extends Controller
             'status' => 'required|string|in:Not Started,In Progress,Completed',
         ]);
         $task->update($validated);
-
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully');
     }
 
@@ -112,7 +111,6 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $task->delete();
-
         return redirect()->route('tasks.index')->with('success', 'Task deleted successfully');
     }
 }

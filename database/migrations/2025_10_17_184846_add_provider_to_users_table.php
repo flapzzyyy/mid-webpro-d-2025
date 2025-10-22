@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('provider_id')->nullable()->after('password');
             $table->string('provider_name')->nullable()->after('provider_id');
-            $table->string('provider_token')->nullable()->after('provider_name');
-            $table->string('provider_refresh_token')->nullable()->after('provider_token');
+            $table->text('provider_token')->nullable()->after('provider_name');
+            $table->text('provider_refresh_token')->nullable()->after('provider_token');
             $table->string('password')->nullable()->change();
         });
     }
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->drioColumn([
+            $table->dropColumn([
                 'provider_id',
                 'provider_name',
                 'provider_token',

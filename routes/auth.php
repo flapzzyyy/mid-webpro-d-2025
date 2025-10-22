@@ -14,6 +14,7 @@ Route::middleware('guest')->group(function () {
         ->name('register');
 
     Route::post('register', [RegisteredUserController::class, 'store'])
+        ->middleware('throttle:100,1')
         ->name('register.store');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
@@ -40,11 +41,11 @@ Route::middleware('auth')->group(function () {
         ->name('verification.notice');
 
     Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
+        ->middleware(['signed', 'throttle:100,1'])
         ->name('verification.verify');
 
     Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware('throttle:3,1')
+        ->middleware('throttle:100,1')
         ->name('verification.send');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
