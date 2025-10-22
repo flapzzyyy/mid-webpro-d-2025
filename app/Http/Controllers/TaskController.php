@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Task;
+use App\Models\TaskCategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\TaskList;
-use App\Models\Task;
 
 class TaskController extends Controller
 {
@@ -14,15 +14,14 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $query = Task::with('list')
-            ->whereHas('list', function ($query) {
+        $query = Task::with('category')
+            ->whereHas('category', function ($query) {
                 $query->where('user_id', auth()->id());
             })->orderBy('created_at', 'desc');
 
         if (request()->has('search')) {
             $search = request('search');
-            $query->where(function ($q) use ($search)
-            {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
             });
@@ -33,11 +32,11 @@ class TaskController extends Controller
         }
 
         $tasks = $query->paginate(10);
-        $lists = TaskList::where('user_id', auth()->id())->get();
+        $categories = TaskCategory::where('user_id', auth()->id())->get();
 
         return Inertia::render('task/index', [
             'tasks' => $tasks,
-            'lists' => $lists,
+            'categories' => $categories,
             'filters' => [
                 'search' => request('search', ''),
                 'filter' => request('filter', ''),
@@ -45,7 +44,7 @@ class TaskController extends Controller
             'flash' => [
                 'success' => session('success'),
                 'error' => session('error'),
-            ]
+            ],
         ]);
     }
 
@@ -66,10 +65,11 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'due_date' => 'nullable|date',
-            'list_id' => 'required|exists:lists,id',
+            'category_id' => 'required|exists:categories,id',
             'status' => 'required|string|in:Not Started,In Progress,Completed',
         ]);
         Task::create($validated);
+
         return redirect()->route('tasks.index')->with('success', 'Task created successfully');
     }
 
@@ -98,10 +98,11 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'due_date' => 'nullable|date',
-            'list_id' => 'required|exists:lists,id',
+            'category_id' => 'required|exists:categories,id',
             'status' => 'required|string|in:Not Started,In Progress,Completed',
         ]);
         $task->update($validated);
+
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully');
     }
 
@@ -111,6 +112,7 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $task->delete();
+
         return redirect()->route('tasks.index')->with('success', 'Task deleted successfully');
     }
 }

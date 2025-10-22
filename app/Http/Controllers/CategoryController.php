@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
+use App\Models\TaskCategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\TaskList;
 
-class ListController extends Controller
+class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $lists = TaskList::where('user_id', auth()->id())->get();
-        return Inertia::render('list/index', [
-            'lists' => $lists,
+        $categories = TaskCategory::where('user_id', auth()->id())->get();
+
+        return Inertia::render('category/index', [
+            'categories' => $categories,
             'flash' => session('success'),
             'error' => session('error'),
         ]);
@@ -39,11 +39,12 @@ class ListController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
-        TaskList::create([
+        TaskCategory::create([
             ...$validated,
-            'user_id' => auth()->id()
+            'user_id' => auth()->id(),
         ]);
-        return redirect()->route('lists.index')->with('success', 'List created successfully');
+
+        return redirect()->route('categories.index')->with('success', 'Category created successfully');
     }
 
     /**
@@ -65,22 +66,24 @@ class ListController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, TaskList $list)
+    public function update(Request $request, TaskCategory $category)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
-        $list->update($validated);
-        return redirect()->route('lists.index')->with('success', 'List updated successfully');
+        $category->update($validated);
+
+        return redirect()->route('categories.index')->with('success', 'Category updated successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(TaskList $list)
+    public function destroy(TaskCategory $category)
     {
-        $list->delete();
-        return redirect()->route('lists.index')->with('success', 'List deleted successfully');
+        $category->delete();
+
+        return redirect()->route('categories.index')->with('success', 'Category deleted successfully');
     }
 }

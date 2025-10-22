@@ -12,10 +12,11 @@ class Task extends Model
         'description',
         'status',
         'due_date',
-        'list_id',
+        'category_id',
     ];
-    public function list(): BelongsTo
+
+    public function category(): BelongsTo
     {
-        return $this->belongsTo(TaskList::class, 'list_id');
+        return $this->belongsTo(TaskCategory::class, 'category_id');
     }
 }

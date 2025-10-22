@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Task;
+use App\Models\TaskCategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\TaskList;
-use App\Models\Task;
 
 class DashboardController extends Controller
 {
@@ -15,13 +15,13 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $lists = TaskList::where('user_id', $user->id)->get();
-        $tasks = Task::whereHas('list', function ($query) use ($user) {
+        $categories = TaskCategory::where('user_id', $user->id)->get();
+        $tasks = Task::whereHas('category', function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })->get();
 
         $stats = [
-            'total_lists' => $lists->count(),
+            'total_categories' => $categories->count(),
             'total_tasks' => $tasks->count(),
             'completed_tasks' => $tasks->where('status', 'Completed')->count(),
             'in_progress_tasks' => $tasks->where('status', 'In Progress')->count(),
@@ -30,12 +30,12 @@ class DashboardController extends Controller
 
         return Inertia::render('dashboard', [
             'stats' => $stats,
-            'lists' => $lists,
+            'categories' => $categories,
             'tasks' => $tasks,
             'flash' => [
                 'success' => session('success'),
                 'error' => session('error'),
-            ]
+            ],
         ]);
     }
 
