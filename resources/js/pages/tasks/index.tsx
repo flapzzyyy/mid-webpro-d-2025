@@ -9,101 +9,166 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Tasks', href: '/tasks' },
 ];
 
-type Task = {
+// type Task = {
+//     id: number;
+//     title: string;
+//     description?: string;
+//     status?: string;
+//     due_date?: string;
+//     category?: { id: number; title: string } | null;
+// };
+
+// type Props = {
+//     tasks: {
+//         data: Task[];
+//         current_page?: number;
+//         last_page?: number;
+//         total?: number;
+//     };
+//     categories: Array<{ id: number; title: string }>;
+//     filters?: { search?: string; filter?: string };
+//     flash?: { success?: string; error?: string } | string | null;
+// };
+
+interface Task {
     id: number;
     title: string;
-    description?: string;
-    status?: string;
-    due_date?: string;
-    category?: { id: number; title: string } | null;
-};
+    status: "not started" | "in progress" | "completed"; // enum-like
+    due_date: string | null;
+}
 
-type Props = {
-    tasks: {
-        data: Task[];
-        current_page?: number;
-        last_page?: number;
-        total?: number;
-    };
-    categories: Array<{ id: number; title: string }>;
-    filters?: { search?: string; filter?: string };
-    flash?: { success?: string; error?: string } | string | null;
-};
+interface TasksProps {
+    tasks: Task[];
+}
 
-export default function Index({ tasks = { data: [] }, categories = [], filters = {}, flash = null }: Props) {
-    const [search, setSearch] = useState(filters.search || '');
-    const [filter, setFilter] = useState(filters.filter || 'all');
+// export default function Index({ tasks = { data: [] }, categories = [], filters = {}, flash = null }: Props) {
 
-    function onSearch(e: FormEvent) {
-        e.preventDefault();
-        const params = new URLSearchParams();
-        if (search) params.set('search', search);
-        if (filter) params.set('filter', filter);
-        // simple navigation via link (full Inertia form alternative omitted for brevity)
-        window.location.href = `/tasks?${params.toString()}`;
-    }
+export default function Tasks({ tasks }: TasksProps) {
+    // const [search, setSearch] = useState(filters.search || '');
+    // const [filter, setFilter] = useState(filters.filter || 'all');
+
+    // function onSearch(e: FormEvent) {
+    //     e.preventDefault();
+    //     const params = new URLSearchParams();
+    //     if (search) params.set('search', search);
+    //     if (filter) params.set('filter', filter);
+    //     // simple navigation via link (full Inertia form alternative omitted for brevity)
+    //     window.location.href = `/tasks?${params.toString()}`;
+    // }
+
+    const [filter, setFilter] = useState("all");
+    const filteredTasks =
+    filter === "all"
+        ? tasks
+        : tasks.filter(
+              (t) => t.status.toLowerCase() === filter.toLowerCase()
+          );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tasks" />
+            <Head title="Dashboard" />
             <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-2xl font-semibold">Tasks</h1>
-                    <Link href="/tasks/create" className="btn">+ New Task</Link>
+                <div className="mb-6">
+                    <h1 className="text-3xl font-semibold">Tasks</h1>
+                    <p className="text-gray-600 mt-1">Manage all your tasks here.</p>
                 </div>
 
-                {flash && typeof flash === 'object' && flash.success && (
-                    <div className="mb-4 text-green-600">{flash.success}</div>
-                )}
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex gap-3">
+                        <button
+                            onClick={() => setFilter("all")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium border ${
+                                filter === "all"
+                                    ? "bg-gray-800 text-white"
+                                    : "bg-white hover:bg-gray-100"
+                            }`}
+                        >
+                            All
+                        </button>
+                        <button
+                            onClick={() => setFilter("not started")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium border ${
+                                filter === "not started"
+                                    ? "bg-red-600 text-white"
+                                    : "bg-white hover:bg-gray-100"
+                            }`}
+                        >
+                            Not Started
+                        </button>
+                        <button
+                            onClick={() => setFilter("in progress")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium border ${
+                                filter === "in progress"
+                                    ? "bg-yellow-500 text-white"
+                                    : "bg-white hover:bg-gray-100"
+                            }`}
+                        >
+                            In Progress
+                        </button>
+                        <button
+                            onClick={() => setFilter("completed")}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium border ${
+                                filter === "completed"
+                                    ? "bg-green-600 text-white"
+                                    : "bg-white hover:bg-gray-100"
+                            }`}
+                        >
+                            Completed
+                        </button>
+                    </div>
 
-                <form onSubmit={onSearch} className="flex gap-2 mb-4">
-                    <input value={search} onChange={(e) => setSearch(e.target.value)} name="search" placeholder="Search title or description" className="input" />
-                    <select value={filter} onChange={(e) => setFilter(e.target.value)} name="filter" className="input">
-                        <option value="all">All</option>
-                        <option value="completed">Completed</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="not_started">Not Started</option>
-                    </select>
-                    <button type="submit" className="btn">Apply</button>
-                </form>
+                    <Link
+                        href='/tasks/create'
+                        className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium hover:bg-gray-700"
+                    >
+                        + Create Task
+                    </Link>
+                </div>
 
-                <div className="space-y-3">
-                    {tasks.data.length === 0 ? (
-                        <div className="p-4 border rounded">No tasks found.</div>
-                    ) : (
-                        tasks.data.map((t) => (
-                            <div key={t.id} className="p-4 border rounded flex justify-between items-start">
+                {filteredTasks.length > 0 ? (
+                    <div className="grid gap-3">
+                        {filteredTasks.map((task) => (
+                            <div
+                                key={task.id}
+                                className="border rounded-lg p-4 flex justify-between items-center hover:bg-gray-50"
+                            >
                                 <div>
-                                    <h3 className="font-medium">{t.title}</h3>
-                                    {t.category && <div className="text-sm text-muted">{t.category.title}</div>}
-                                    {t.description && <p className="mt-1 text-sm">{t.description}</p>}
-                                    {t.due_date && <div className="text-xs mt-1">Due: {new Date(t.due_date).toLocaleDateString()}</div>}
+                                    <p className="font-medium text-gray-800">
+                                        {task.title}
+                                    </p>
+                                    <p className="text-sm text-gray-500 capitalize">
+                                        {task.status}
+                                    </p>
+                                    {task.due_date && (
+                                        <p className="text-xs text-gray-400 mt-1">
+                                            Due:{" "}
+                                            {new Date(
+                                                task.due_date
+                                            ).toLocaleDateString()}
+                                        </p>
+                                    )}
                                 </div>
-                                <div className="text-right">
-                                    <div className="mb-2 text-sm">{t.status}</div>
-                                    <div className="flex flex-col gap-1">
-                                        <Link href={`/tasks/${t.id}/edit`} className="text-sm underline">Edit</Link>
-                                        <Button
-                                            variant="destructive"
-                                            size="sm"
-                                            onClick={() => {
-                                                if (confirm(`Delete task "${t.title}"?`)) {
-                                                    router.delete(`/tasks/${t.id}`);
-                                                }
-                                            }}
-                                        >
-                                            Delete
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))
-                    )}
-                </div>
 
-                <div className="mt-4 text-sm text-muted">
-                    Page {tasks.current_page ?? 1} of {tasks.last_page ?? 1} — Total: {tasks.total ?? tasks.data.length}
-                </div>
+                                {/* Badge status */}
+                                <span
+                                    className={`px-3 py-1 text-xs rounded-full font-medium ${
+                                        task.status === "completed"
+                                            ? "bg-green-100 text-green-700"
+                                            : task.status === "in progress"
+                                            ? "bg-yellow-100 text-yellow-700"
+                                            : "bg-red-100 text-red-700"
+                                    }`}
+                                >
+                                    {task.status}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center text-gray-500 py-12 border rounded-lg">
+                        No tasks found.
+                    </div>
+                )}
             </div>
         </AppLayout>
     );

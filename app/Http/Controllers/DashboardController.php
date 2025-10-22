@@ -12,22 +12,37 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-
-        // Ambil total list dan task milik user
-        $totalCategories = TaskCategory::where('user_id', $user->id)->count();
-        $totalTasks = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))->count();
-
-        // Ambil 5 task terbaru milik user
+        
+        $totalNotStarted = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
+            ->where('status', 'not started')
+            ->count();
+        $totalInProgress = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
+            ->where('status', 'in progress')
+            ->count();
+        $totalCompleted = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
+            ->where('status', 'completed')
+            ->count();
+        $totalTasks = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
+            ->count();
+        
         $recentTasks = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
             ->latest()
-            ->take(5)
+            ->take(3)
+            ->get(['id', 'title', 'status', 'due_date']);
+        $upcomingTasks = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
+            ->whereNotNull('due_date')
+            ->whereDate('due_date', '>=', now()) // hanya yang belum lewat
+            ->orderBy('due_date', 'asc')
+            ->take(3)
             ->get(['id', 'title', 'status', 'due_date']);
 
         return Inertia::render('dashboard', [
-            'user' => $user,
-            'totalCategories' => $totalCategories,
+            'totalNotStarted' => $totalNotStarted,
+            'totalInProgress' => $totalInProgress,
+            'totalCompleted' => $totalCompleted,
             'totalTasks' => $totalTasks,
             'recentTasks' => $recentTasks,
+            'upcomingTasks' => $upcomingTasks,
         ]);
     }
 }

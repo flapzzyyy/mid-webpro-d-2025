@@ -3,94 +3,109 @@ import { Head, Link } from "@inertiajs/react";
 import { type BreadcrumbItem } from "@/types";
 
 type Props = {
-  user: {
-    name: string;
-    email: string;
-  };
-  totalCategories: number;
-  totalTasks: number;
-  recentTasks: Array<{
-    id: number;
-    title: string;
-    status: string;
-    due_date?: string;
-  }>;
+    totalNotStarted?: number;
+    totalInProgress?: number;
+    totalCompleted?: number;
+    totalTasks?: number;
+
+    recentTasks?: Array<{
+        id: number;
+        title: string;
+        status: string;
+        due_date?: string;
+    }>;
+    
+    upcomingTasks?: Array<{
+        id: number;
+        title: string;
+        status: string;
+        due_date?: string;
+    }>;
 };
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: "Dashboard", href: "/dashboard" }];
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: "Dashboard", href: "/dashboard" }
+];
 
-export default function Dashboard({
-                                    user,
-                                    totalCategories,
-                                    totalTasks,
-                                    recentTasks,
-                                }: Props) 
+export default function Dashboard({ totalNotStarted = 0, totalInProgress = 0, totalCompleted = 0, totalTasks = 0, recentTasks = [], upcomingTasks = [] }: Props) 
 {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="p-6 space-y-6">
-                <h1 className="text-3xl font-semibold">Welcome, {user.name} 👋</h1>
-
-                {/* Summary Cards */}
-                <div className="grid gap-4 md:grid-cols-3">
-                <div className="border rounded-xl p-4 text-center shadow-sm">
-                    <h2 className="text-xl font-medium">Categories</h2>
-                    <p className="text-3xl font-bold text-blue-600">{totalCategories}</p>
-                </div>
-                <div className="border rounded-xl p-4 text-center shadow-sm">
-                    <h2 className="text-xl font-medium">Tasks</h2>
-                    <p className="text-3xl font-bold text-green-600">{totalTasks}</p>
-                </div>
-                <div className="border rounded-xl p-4 text-center shadow-sm">
-                    <h2 className="text-xl font-medium">Completed</h2>
-                    <p className="text-3xl font-bold text-gray-600">
-                    {recentTasks.filter((t) => t.status === "Completed").length}
-                    </p>
-                </div>
-                </div>
-
-                {/* Recent Tasks */}
-                <div className="mt-8">
-                <h2 className="text-2xl font-semibold mb-3">Recent Tasks</h2>
-                {recentTasks.length === 0 ? (
-                    <p className="text-gray-500">No recent tasks yet.</p>
-                ) : (
-                    <div className="border rounded-xl divide-y">
-                    {recentTasks.map((task) => (
-                        <div
-                        key={task.id}
-                        className="flex justify-between items-center p-3 hover:bg-gray-50"
-                        >
-                        <div>
-                            <p className="font-medium">{task.title}</p>
-                            <p className="text-sm text-gray-500">
-                            {task.due_date ? `Due: ${task.due_date}` : "No due date"}
-                            </p>
-                        </div>
-                        <span
-                            className={`text-sm px-3 py-1 rounded-full ${
-                            task.status === "Completed"
-                                ? "bg-green-100 text-green-700"
-                                : task.status === "In Progress"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : "bg-gray-100 text-gray-600"
-                            }`}
-                        >
-                            {task.status}
-                        </span>
-                        </div>
-                    ))}
+            <div className="p-6">
+                <div className="mb-6 flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-semibold">Dashboard</h1>
+                        <p className="text-gray-600 mt-1">
+                            Welcome back! Here's your overview.
+                        </p>
                     </div>
-                )}
-                <div className="mt-3">
-                    <Link
-                    href="/tasks"
-                    className="text-blue-600 underline hover:text-blue-800"
-                    >
-                    View All Tasks →
-                    </Link>
+                    <div className="flex gap-3">
+                        <Link href="#" className="px-4 py-2 text-sm font-medium bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition">+ Create Task</Link>
+                        <Link href="#" className="px-4 py-2 text-sm font-medium bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition">+ Create Category</Link>
+                    </div>
                 </div>
+                <div className="grid gap-4 grid-rows-3 grid-cols-4">
+                    <div className="bg-red-50 border rounded-xl p-4 text-center">
+                        <h2 className="font-medium text-red-700">Not Started Tasks</h2>
+                        <p className="text-3xl font-bold text-red-600 my-6 pt">{totalNotStarted}</p>
+                        <p className="text-sm text-gray-500 mt-1">Waiting to start</p>
+                    </div>
+                    <div className="bg-yellow-50 border rounded-xl p-4 text-center">
+                        <h2 className="font-medium text-yellow-700">In Progress Tasks</h2>
+                        <p className="text-3xl font-bold text-yellow-600 my-6">{totalInProgress}</p>
+                        <p className="text-sm text-gray-500 mt-1">Is running</p>
+                    </div>
+                    <div className="bg-green-50 border rounded-xl p-4 text-center">
+                        <h2 className="font-medium text-green-700">Completed Tasks</h2>
+                        <p className="text-3xl font-bold text-green-600 my-6">{totalCompleted}</p>
+                        <p className="text-sm text-gray-500 mt-1">Finished</p>
+                    </div>
+                    <div className="bg-blue-50 border rounded-xl p-4 text-center">
+                        <h2 className="font-medium text-blue-700">Total Tasks</h2>
+                        <p className="text-3xl font-bold text-blue-600 my-6">{totalTasks}</p>
+                        <p className="text-sm text-gray-500 mt-1">All your tasks</p>
+                    </div>
+                    <div className="border rounded-xl p-4 row-span-2 col-span-2">
+                        <h2 className="text-lg font-bold mb-1">Recent Tasks</h2>
+                        <p className="text-sm text-gray-500 mb-4">Keep up with your most recent tasks.</p>
+                        {recentTasks.length > 0 ? (
+                            <ul className="space-y-2">
+                                {recentTasks.map((task: any) => (
+                                <li key={task.id} className="p-3 border rounded-lg hover:bg-gray-50 flex justify-between items-center">
+                                    <div>
+                                    <p className="font-medium text-gray-800">{task.title}</p>
+                                    <p className="text-sm text-gray-500 capitalize">{task.status}</p>
+                                    </div>
+                                    {task.due_date && (
+                                    <span className="text-xs text-gray-400">{new Date(task.due_date).toLocaleDateString()}</span>
+                                    )}
+                                </li>
+                                ))}
+                            </ul>
+                            ) : (
+                            <p className="text-sm text-gray-400">No recent tasks.</p>
+                        )}
+                    </div>
+                    <div className="border rounded-xl p-4 row-span-2 col-span-2">
+                        <h2 className="text-lg font-bold mb-1">Upcoming Tasks</h2>
+                        <p className="text-sm text-gray-500 mb-4">Plan ahead with tasks due soon.</p>
+                        {upcomingTasks.length > 0 ? (
+                            <ul className="space-y-2">
+                                {upcomingTasks.map((task: any) => (
+                                <li key={task.id} className="p-3 border rounded-lg hover:bg-gray-50 flex justify-between items-center">
+                                    <div>
+                                    <p className="font-medium text-gray-800">{task.title}</p>
+                                    <p className="text-sm text-gray-500 capitalize">{task.status}</p>
+                                    </div>
+                                    <span className="text-xs text-gray-400">{new Date(task.due_date).toLocaleDateString()}</span>
+                                </li>
+                                ))}
+                            </ul>
+                            ) : (
+                            <p className="text-sm text-gray-400">No upcoming tasks.</p>
+                        )}
+                    </div>
                 </div>
             </div>
         </AppLayout>

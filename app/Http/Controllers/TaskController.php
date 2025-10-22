@@ -15,6 +15,8 @@ class TaskController extends Controller
      */
     public function index()
     {
+        $user = Auth::user();
+    
         $query = Task::with('category')
             ->whereHas('category', function ($query) {
                 $query->where('user_id', Auth::id());
@@ -42,7 +44,12 @@ class TaskController extends Controller
             }
         }
 
-        $tasks = $query->paginate(10);
+        // $tasks = $query->paginate(10);
+
+        $tasks = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
+            ->orderBy('created_at', 'desc')
+            ->get(['id', 'title', 'status', 'due_date']);
+
         $categories = TaskCategory::where('user_id', Auth::id())->get();
 
         return Inertia::render('tasks/index', [
