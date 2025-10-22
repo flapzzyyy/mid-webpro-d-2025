@@ -1,5 +1,6 @@
 import NewPasswordController from '@/actions/App/Http/Controllers/Auth/NewPasswordController';
 import { Form, Head } from '@inertiajs/react';
+import { toast } from 'sonner';
 
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -30,19 +31,21 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                     <div className="grid gap-6">
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                name="email"
-                                autoComplete="email"
-                                value={email}
-                                className="mt-1 block w-full"
-                                readOnly
-                            />
-                            <InputError
-                                message={errors.email}
-                                className="mt-2"
-                            />
+                            <div
+                                onClick={() => toast.error('Email tidak dapat diubah')}
+                                className="cursor-pointer"
+                                title="Email tidak dapat diubah."
+                            >
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    autoComplete="email"
+                                    value={email}
+                                    className="mt-1 block w-full disabled:opacity-75 disabled:cursor-pointer"
+                                    disabled
+                                />
+                            </div>
                         </div>
 
                         <div className="grid gap-2">
