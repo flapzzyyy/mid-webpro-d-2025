@@ -33,5 +33,10 @@ WORKDIR /var/www/html
 COPY --from=build /var/www/html /var/www/html
 COPY nginx.conf /etc/nginx/nginx.conf
 
+RUN chown -R nobody:nobody /var/www/html/storage \
+    && chown -R nobody:nobody /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache
+
 EXPOSE 8080
 CMD php-fpm -D && nginx -g "daemon off;"
