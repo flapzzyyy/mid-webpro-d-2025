@@ -44,7 +44,13 @@ class ProvideCallbackController extends Controller
 
         Auth::login($user);
 
-        return redirect('/dashboard');
+        if (is_null($user->password)) {
+            return redirect()->route('password.set');
+        }
+
+        return redirect()->intended('/dashboard');
+
+        // return redirect('/dashboard');
     }
 
     private function generateUsername($sosmedUser, $provider)
