@@ -54,7 +54,7 @@ export default function Categories({ categories }: Props) {
     // Paging
     const [currentPage, setCurrentPage] = useState(1);
 
-    const itemsPerPage = 5;
+    const itemsPerPage = 6;
     const maxPages = 5;
 
     const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);

@@ -559,7 +559,7 @@ export default function Tasks({ tasks, categories }: Props) {
                                 ?
                             </p>
                             <p className="text-sm text-gray-500">
-                                This task will be permanently deleted and cannot be recovered.
+                                This task will be permanently deleted.
                             </p>
                         </div>
                         <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
