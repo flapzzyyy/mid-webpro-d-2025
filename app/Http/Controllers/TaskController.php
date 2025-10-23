@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Models\TaskCategory;
 use App\Models\Task;
+use App\Models\TaskCategory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class TaskController extends Controller
 {
@@ -83,6 +83,7 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $task->delete();
+
         return redirect()->route('tasks.index')->with('success', 'Task deleted successfully');
     }
 }

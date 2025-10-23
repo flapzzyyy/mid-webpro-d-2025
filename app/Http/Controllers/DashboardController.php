@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TaskCategory;
 use App\Models\Task;
+use App\Models\TaskCategory;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
