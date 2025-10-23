@@ -5,7 +5,7 @@
 FROM php:8.4-cli AS build
 
 RUN apt-get update && apt-get install -y \
-    unzip git curl libpng-dev libzip-dev zip npm \
+    unzip git curl nginx bash libpng-dev libzip-dev zip npm \
     && docker-php-ext-install pdo_mysql gd zip
 
 WORKDIR /var/www/html
@@ -23,11 +23,15 @@ RUN npm install && npm run build || echo "Skipping vite build (no vite config)"
 
 FROM php:8.4-fpm-alpine
 
-RUN apk add --no-cache libpng libzip
+RUN apk add --no-cache \
+    mysql-client \
+    nginx \
+    && docker-php-ext-install pdo pdo_mysql
 
 WORKDIR /var/www/html
 
 COPY --from=build /var/www/html /var/www/html
+COPY nginx.conf /etc/nginx/nginx.conf
 
-EXPOSE 9000
-CMD ["php-fpm"]
+EXPOSE 8080
+CMD php-fpm -D && nginx -g "daemon off;"
