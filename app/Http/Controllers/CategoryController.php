@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Models\TaskCategory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
@@ -29,7 +29,6 @@ class CategoryController extends Controller
     {
         return inertia('categories/create');
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -63,7 +62,6 @@ class CategoryController extends Controller
         ]);
     }
 
-
     /**
      * Show the form for editing the specified resource.
      */
@@ -84,6 +82,7 @@ class CategoryController extends Controller
             'description' => 'nullable|string',
         ]);
         $category->update($validated);
+
         return redirect()->route('categories.index')->with('success', 'Category updated successfully');
     }
 
@@ -93,6 +92,7 @@ class CategoryController extends Controller
     public function destroy(TaskCategory $category)
     {
         $category->delete();
+
         return redirect()->route('categories.index')->with('success', 'Category deleted successfully');
     }
 }

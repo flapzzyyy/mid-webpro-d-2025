@@ -12,9 +12,10 @@ class SetPasswordController extends Controller
 {
     public function create()
     {
-        if(auth()->user()->password !== null) {
+        if (auth()->user()->password !== null) {
             return redirect()->route('/dashboard');
         }
+
         return Inertia::render('auth/set-password');
     }
 

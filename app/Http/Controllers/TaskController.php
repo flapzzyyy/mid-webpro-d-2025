@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Models\TaskCategory;
 use App\Models\Task;
+use App\Models\TaskCategory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class TaskController extends Controller
 {
@@ -16,7 +16,7 @@ class TaskController extends Controller
     public function index()
     {
         $user = Auth::user();
-    
+
         $query = Task::with('category')
             ->whereHas('category', function ($query) {
                 $query->where('user_id', Auth::id());
@@ -101,7 +101,6 @@ class TaskController extends Controller
         return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
     }
 
-
     /**
      * Display the specified resource.
      */
@@ -124,7 +123,6 @@ class TaskController extends Controller
         ]);
     }
 
-
     /**
      * Update the specified resource in storage.
      */
@@ -143,13 +141,13 @@ class TaskController extends Controller
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }
 
-
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Task $task)
     {
         $task->delete();
+
         return redirect()->route('tasks.index')->with('success', 'Task deleted successfully');
     }
 }

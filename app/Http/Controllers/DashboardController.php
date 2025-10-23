@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TaskCategory;
 use App\Models\Task;
+use App\Models\TaskCategory;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -12,7 +12,7 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
+
         $totalNotStarted = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
             ->where('status', 'not started')
             ->count();
@@ -24,7 +24,7 @@ class DashboardController extends Controller
             ->count();
         $totalTasks = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
             ->count();
-        
+
         $recentTasks = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
             ->latest()
             ->take(3)
