@@ -12,26 +12,29 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $categoryIds = TaskCategory::where('user_id', $user->id)->pluck('id');
         
-        $totalNotStarted = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
+        $totalNotStarted = Task::whereIn('category_id', $categoryIds)
             ->where('status', 'not started')
             ->count();
-        $totalInProgress = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
+        $totalInProgress = Task::whereIn('category_id', $categoryIds)
             ->where('status', 'in progress')
             ->count();
-        $totalCompleted = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
+        $totalCompleted = Task::whereIn('category_id', $categoryIds)
             ->where('status', 'completed')
             ->count();
-        $totalTasks = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
+        $totalTasks = Task::whereIn('category_id', $categoryIds)
             ->count();
         
-        $recentTasks = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
+        $recentTasks = Task::whereIn('category_id', $categoryIds)
+            ->where('status', '<>', 'Completed')
             ->latest()
             ->take(3)
-            ->get(['id', 'title', 'status', 'due_date']);
-        $upcomingTasks = Task::whereIn('category_id', TaskCategory::where('user_id', $user->id)->pluck('id'))
+            ->get(['id', 'title', 'status', 'created_at']);
+        $upcomingTasks = Task::whereIn('category_id', $categoryIds)
+            ->where('status', '<>', 'Completed')
             ->whereNotNull('due_date')
-            ->whereDate('due_date', '>=', now()) // hanya yang belum lewat
+            ->whereDate('due_date', '>=', now())
             ->orderBy('due_date', 'asc')
             ->take(3)
             ->get(['id', 'title', 'status', 'due_date']);

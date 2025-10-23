@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\TaskCategory;
@@ -10,30 +9,31 @@ use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $user = Auth::user();
 
-        $categories = TaskCategory::where('user_id', $user->id)
-            ->get(['id', 'title', 'description']);
+        $query = TaskCategory::where('user_id', $user->id)
+            ->select('id', 'title', 'description')
+            ->withCount('tasks'); // 🔥 Tambahkan ini untuk menghitung jumlah task per kategori
 
-        return inertia('categories/index', [
+        if ($search = request('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $categories = $query->get();
+
+        return Inertia::render('categories/index', [
             'categories' => $categories,
+            'filters' => [
+                'search' => request('search', ''),
+            ],
         ]);
     }
 
-    public function create()
-    {
-        return inertia('categories/create');
-    }
-
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -49,47 +49,17 @@ class CategoryController extends Controller
         return redirect()->route('categories.index')->with('success', 'Category created successfully');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(TaskCategory $category)
-    {
-        // Ambil semua task yang terkait dengan list ini
-        $tasks = $category->tasks()->orderBy('created_at', 'desc')->get();
-
-        return Inertia::render('categories/show', [
-            'category' => $category,
-            'tasks' => $tasks,
-        ]);
-    }
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(TaskCategory $category)
-    {
-        return Inertia::render('categories/create', [
-            'category' => $category,
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, TaskCategory $category)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
+        
         $category->update($validated);
         return redirect()->route('categories.index')->with('success', 'Category updated successfully');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(TaskCategory $category)
     {
         $category->delete();
