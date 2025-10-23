@@ -219,9 +219,9 @@ export default function Tasks({ tasks, categories }: Props) {
                         className="min-w-[180px] rounded-lg border border-gray-300 bg-white px-2 py-2 focus:border-transparent focus:ring-2 focus:ring-gray-800 focus:outline-none"
                     >
                         <option value="all">Filter by status</option>
+                        <option value="Not Started">Not Started</option>
                         <option value="In Progress">In Progress</option>
                         <option value="Completed">Completed</option>
-                        <option value="Not Started">Not Started</option>
                     </select>
                     <button
                         onClick={() => {
