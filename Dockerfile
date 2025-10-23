@@ -42,4 +42,4 @@ RUN mkdir -p /var/www/html/storage/framework/views \
     && chmod -R 777 /var/www/html/bootstrap/cache
 
 EXPOSE 8080
-CMD php artisan migrate --force && php-fpm -D && nginx -g "daemon off;"
+CMD php artisan config:cache && php artisan migrate --force && php-fpm -D && nginx -g "daemon off;"
