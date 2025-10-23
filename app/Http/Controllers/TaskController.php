@@ -22,7 +22,7 @@ class TaskController extends Controller
             $search = request('search');
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -63,6 +63,7 @@ class TaskController extends Controller
         ]);
 
         Task::create($validated);
+
         return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
     }
 
@@ -77,6 +78,7 @@ class TaskController extends Controller
         ]);
 
         $task->update($validated);
+
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }
 

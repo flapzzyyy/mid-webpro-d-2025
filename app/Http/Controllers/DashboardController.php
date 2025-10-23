@@ -13,7 +13,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         $categoryIds = TaskCategory::where('user_id', $user->id)->pluck('id');
-        
+
         $totalNotStarted = Task::whereIn('category_id', $categoryIds)
             ->where('status', 'not started')
             ->count();
@@ -25,7 +25,7 @@ class DashboardController extends Controller
             ->count();
         $totalTasks = Task::whereIn('category_id', $categoryIds)
             ->count();
-        
+
         $recentTasks = Task::whereIn('category_id', $categoryIds)
             ->where('status', '<>', 'Completed')
             ->latest()

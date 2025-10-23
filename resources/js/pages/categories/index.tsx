@@ -1,7 +1,7 @@
-import { Head, Link, router, usePage } from "@inertiajs/react";
+import { Head, router, usePage } from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from "@/types";
-import { Pencil, Trash2, FolderOpen, Search, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Pencil, Trash2, Search, X } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -43,7 +43,7 @@ export default function Categories({ categories }: Props) {
 
     // Search
     const [searchQuery, setSearchQuery] = useState('');
-    
+
     const filteredCategories = categories.filter((category) => {
         const matchesSearch =
             category.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

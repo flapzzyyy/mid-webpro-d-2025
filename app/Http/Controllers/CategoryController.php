@@ -20,7 +20,7 @@ class CategoryController extends Controller
         if ($search = request('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -55,7 +55,7 @@ class CategoryController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
-        
+
         $category->update($validated);
 
         return redirect()->route('categories.index')->with('success', 'Category updated successfully');
