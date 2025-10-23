@@ -21,17 +21,26 @@ class ProvideCallbackController extends Controller
 
         $username = $this->generateUsername($sosmedUser, $provider);
 
-        $user = User::updateOrCreate([
+        $user = User::firstOrCreate([
+            'email' => $sosmedUser->email,
+        ], [
             'provider_id' => $sosmedUser->id,
             'provider_name' => $provider,
-        ], [
             'name' => $sosmedUser->name,
-            'email' => $sosmedUser->email,
             'username' => $username,
             'provider_token' => $sosmedUser->token,
             'provider_refresh_token' => $sosmedUser->refreshToken,
             'email_verified_at' => now(),
         ]);
+
+        if (! $user->wasRecentlyCreated) {
+            $user->update([
+                'provider_id' => $sosmedUser->id,
+                'provider_name' => $provider,
+                'provider_token' => $sosmedUser->token,
+                'provider_refresh_token' => $sosmedUser->refreshToken,
+            ]);
+        }
 
         Auth::login($user);
 
